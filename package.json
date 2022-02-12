@@ -1,0 +1,21 @@
+{
+  "name": "nft",
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "@openzeppelin/contracts": "^4.4.2",
+    "@types/mocha": "^9.0.0",
+    "chai": "^4.3.4",
+    "dotenv": "^10.0.0",
+    "ethereum-waffle": "^3.4.0",
+    "ethers": "^5.4.7",
+    "hardhat": "^2.6.5",
+    "hardhat-gas-reporter": "^1.0.7",
+    "hardhat-shorthand": "^1.0.0",
+    "ts-node": "^10.2.1",
+    "typescript": "^4.4.3"
+  },
+  "dependencies": {
+    "@ethersproject/contracts": "^5.5.0"
+  }
+}
