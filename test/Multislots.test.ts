@@ -33,6 +33,15 @@ describe("Tests for test contract", () => {
             let valuesFS = await contract.getValuesFromSlot(bits)
 
             expect(valuesFS).to.deep.equal(values)
+
+            await contract.setValueToSlot(mv.u16, 192, 32)
+            valuesFS = await contract.getValuesFromSlot(bits)
+
+            expect(valuesFS).to.deep.equal([mv.u16, mv.u192])
+
+            let singleValue = await contract.getValueFromSlot(192, 32)
+
+            expect(singleValue).to.be.equal(mv.u16)
         })
 
         it("Four values, very tight", async () => {
@@ -43,6 +52,16 @@ describe("Tests for test contract", () => {
             let valuesFS = await contract.getValuesFromSlot(bits)
 
             expect(valuesFS).to.deep.equal(values)
+
+            await contract.setValueToSlot(mv.u64, 56 + 32, 160)
+            await contract.setValueToSlot(mv.u16, 0, 32)
+            valuesFS = await contract.getValuesFromSlot(bits)
+
+            expect(valuesFS).to.deep.equal([mv.u8, mv.u64, mv.u56, mv.u16])
+
+            let singleValue = await contract.getValueFromSlot(56 + 32, 160)
+
+            expect(singleValue).to.be.equal(mv.u64)
         })
     })
 
@@ -53,12 +72,19 @@ describe("Tests for test contract", () => {
             await expect(contract.setValuesToSlot(values, bits)).to.be.revertedWith(
                 "too big value"
             )
+            await expect(contract.setValueToSlot(mv.u64, 8, 32)).to.be.revertedWith(
+                "too big value"
+            )
         })
 
         it("Too many bits to shrink", async () => {
             let values = [mv.u8, mv.u248, mv.u16]
             let bits = [8, 248, 16]
+
             await expect(contract.setValuesToSlot(values, bits)).to.be.revertedWith(
+                "too many bits"
+            )
+            await expect(contract.setValueToSlot(mv.u8, 255, 2)).to.be.revertedWith(
                 "too many bits"
             )
         })
@@ -69,6 +95,9 @@ describe("Tests for test contract", () => {
             await contract.setValuesToSlot(values, bits)
 
             await expect(contract.getValuesFromSlot([248, 16])).to.be.revertedWith(
+                "too many bits"
+            )
+            await expect(contract.setValueToSlot(mv.u8, 255, 2)).to.be.revertedWith(
                 "too many bits"
             )
         })
