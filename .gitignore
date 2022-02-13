@@ -5,3 +5,5 @@ cache
 .env
 *.js
 *.yaml
+coverage
+coverage.json
