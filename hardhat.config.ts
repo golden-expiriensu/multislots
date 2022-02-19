@@ -4,6 +4,7 @@ dotenvConfig();
 import '@nomiclabs/hardhat-waffle';
 import "@nomiclabs/hardhat-ethers";
 import 'solidity-coverage';
+import "hardhat-gas-reporter"
 
 /**
  * @type import('hardhat/config').HardhatUserConfig

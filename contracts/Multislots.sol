@@ -7,6 +7,7 @@ pragma solidity ^0.8.4;
 /// @dev You always can delete these functions or add your own for [special value]
 library Multislots {
     /// @notice Pushs single value with specified bit-length and right offset to an existing multislot
+    /// @dev Assembly advantage: 211 / 211 (via Multislots.test.ts)
     /// @param _multislot An existing multislot in which you want to push the value
     /// @param _value The value to push
     /// @param _rightOffset An bit-offset from the right side of the _value: 0x|left offset|value|right offset|
@@ -18,11 +19,19 @@ library Multislots {
         uint8 _rightOffset,
         uint8 _valueBitLength
     ) internal pure returns(uint256 multislot_) {
-        require(uint16(_rightOffset) + uint16(_valueBitLength) <= 256, "too many bits");
-        require(_value < 1 << _valueBitLength, "too big value");
-        uint256 mask = ~((1 << _valueBitLength) - 1 << _rightOffset);
-        multislot_ = _multislot & mask;
-        multislot_ |= _value << _rightOffset;
+        assembly {
+            if gt(add(_rightOffset, _valueBitLength), 256) {
+                revert(0, 0)
+            }
+            let max := shl(_valueBitLength, 1)
+            if or(gt(_value, max), eq(_value, max)) {
+                revert(0, 0)
+            }
+
+            let mask := not(shl(_rightOffset, sub(max, 1)))
+            multislot_ := and(_multislot, mask)
+            multislot_ := or(multislot_, shl(_rightOffset, _value))
+        }
     }
 
     /// @notice An analog of pushValuesToSlot with arrays with const (2) length as arguments
@@ -31,7 +40,7 @@ library Multislots {
         uint8[2] memory _bits
     ) internal pure returns(uint256 multislot_) {
         uint16 limit;
-        for (uint256 i = 0; i < _bits.length; i++) {
+        for (uint256 i; i < 2; i++) {
             limit += _bits[i];
             require(limit <= 256, "too many bits");
             require(_values[i] < 1 << _bits[i], "too big value");
@@ -48,7 +57,7 @@ library Multislots {
         uint8[3] memory _bits
     ) internal pure returns(uint256 multislot_) {
         uint16 limit;
-        for (uint256 i = 0; i < _bits.length; i++) {
+        for (uint256 i; i < 3; i++) {
             limit += _bits[i];
             require(limit <= 256, "too many bits");
             require(_values[i] < 1 << _bits[i], "too big value");
@@ -61,6 +70,7 @@ library Multislots {
 
     /// @notice The most common function for creating multislot from values and their bit-lengths
     /// @dev There are analogous of this function for constant size arrays, you always can create your own just changing the [number]
+    /// @dev Assembly advantage: 862 / 1820 (via Multislots.test.ts)
     /// @param _values An array of values to compress in multislot. Must be less than the corresponding 2^_bits[i]
     /// @param _bits An array of values bit-lengths respectively to _values
     /// @return multislot_ The result of the compression of the values by their bit-sizes
@@ -68,15 +78,28 @@ library Multislots {
         uint256[] memory _values,
         uint8[] memory _bits
     ) internal pure returns(uint256 multislot_) {
-        require(_values.length == _bits.length, "invalid bits length");
-        uint16 limit;
-        for (uint256 i = 0; i < _bits.length; i++) {
-            limit += _bits[i];
-            require(limit <= 256, "too many bits");
-            require(_values[i] < 1 << _bits[i], "too big value");
-            multislot_ |= _values[i];
-            if (i + 1 < _bits.length) {
-                multislot_ <<= _bits[i + 1];
+        assembly {
+            if iszero(eq(mload(_values), mload(_bits))) {
+                revert(0, 0)
+            }
+            let limit
+
+            for { let i := 0 } lt(i, mload(_bits)) { i := add(i, 1)} {
+                let ibit := mload(add(0x20, add(_bits, mul(i, 0x20))))
+                let ivalue := mload(add(0x20, add(_values, mul(i, 0x20))))
+                limit := add(limit, ibit)
+                if gt(limit, 256) {
+                    revert(0, 0)
+                }
+                let max := shl(ibit, 1)
+                if or(gt(ivalue, max), eq(ivalue, max)) {
+                    revert(0, 0)
+                }
+
+                multislot_ := or(multislot_, ivalue)
+                if lt(add(i, 1), mload(_bits)) { 
+                    multislot_ := shl(mload(add(0x20, add(_bits, mul(add(i, 1), 0x20)))), multislot_)
+                }
             }
         }
     }
@@ -102,7 +125,7 @@ library Multislots {
         uint8[2] memory _bits
     ) internal pure returns(uint256[2] memory values_) {
         uint16 limit;
-        for (int256 i = int256(_bits.length) - 1; i >= 0; i--) {
+        for (int256 i = 1; i >= 0; i--) {
             limit += _bits[uint256(i)];
             require(limit <= 256, "too many bits");
             values_[uint256(i)] = (_multislot << 256 - limit) >> 256 - _bits[uint256(i)];
@@ -115,7 +138,7 @@ library Multislots {
         uint8[3] memory _bits
     ) internal pure returns(uint256[3] memory values_) {
         uint16 limit;
-        for (int256 i = int256(_bits.length) - 1; i >= 0; i--) {
+        for (int256 i = 2; i >= 0; i--) {
             limit += _bits[uint256(i)];
             require(limit <= 256, "too many bits");
             values_[uint256(i)] = (_multislot << 256 - limit) >> 256 - _bits[uint256(i)];
