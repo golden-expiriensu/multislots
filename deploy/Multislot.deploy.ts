@@ -7,7 +7,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   const { deployer } = await getNamedAccounts();
 
-  await deploy("Multislots", {
+  await deploy("Multislot", {
     from: deployer,
     args: [],
     log: true,
@@ -15,4 +15,4 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 };
 
 export default func;
-func.tags = ["mainnet", "Multislots"];
+func.tags = ["mainnet", "Multislot"];

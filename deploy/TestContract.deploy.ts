@@ -12,7 +12,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     args: [],
     log: true,
     libraries: {
-      Multislots: (await hre.ethers.getContract("Multislots")).address,
+      Multislot: (await hre.ethers.getContract("Multislot")).address,
     },
   });
 };

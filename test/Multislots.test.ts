@@ -22,7 +22,7 @@ describe("Tests for test contract", () => {
   let contract: TestContract;
 
   beforeEach(async () => {
-    await deployments.fixture(["Multislots", "TestContract"]);
+    await deployments.fixture(["Multislot", "TestContract"]);
     contract = await ethers.getContract<TestContract>("TestContract");
   });
 

@@ -3,7 +3,7 @@ pragma solidity ^0.8.4;
 
 /// @title A library that facilitates the use of multislots
 /// @notice You have to only specify the values and how many bits they should take in 256-bit slot
-library Multislots {
+library Multislot {
     /// @notice Inserts value with specified bit-length and right offset to a multislot
     /// @param _multislot A multislot where value should be inserted
     /// @param _value The value to push
