@@ -6,3 +6,4 @@ cache
 *.js
 coverage
 coverage.json
+typechain
