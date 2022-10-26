@@ -7,6 +7,6 @@ struct S {
     uint216 value216;
     uint8 value8;
 }, because you also waste gas on packing and unpacking the struct.
-For cheap chains like bsc and fantom, there is no need to use it, but if you use an array of these slots on the mainnet, you can save quite a lot of money.
+For cheap chains like bsc and fantom, there is no need to use it, but if you use an array of these slots on the mainnet, you can save gas for those operations.
 
 Check TestContract.sol and Multislots.test.ts for an example of library use
