@@ -10,10 +10,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   await deploy("TestContract", {
     from: deployer,
     args: [],
-    log: true,
-    libraries: {
-      Multislot: (await hre.ethers.getContract("Multislot")).address,
-    },
+    log: true
   });
 };
 

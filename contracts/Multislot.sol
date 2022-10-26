@@ -15,7 +15,7 @@ library Multislot {
         uint256 _value,
         uint8 _rightOffset,
         uint8 _valueBitLength
-    ) external pure returns (uint256 multislot_) {
+    ) internal pure returns (uint256 multislot_) {
         assembly {
             if gt(add(_rightOffset, _valueBitLength), 256) {
                 revert(0, 0)
@@ -36,7 +36,7 @@ library Multislot {
     /// @param _bits An array of values bit-lengths respectively to _values
     /// @return multislot_ The result of the compression of the values by their bit-sizes
     function packValuesToSlot(uint256[] memory _values, uint8[] memory _bits)
-        external
+        internal
         pure
         returns (uint256 multislot_)
     {
@@ -91,7 +91,7 @@ library Multislot {
         uint256 _multislot,
         uint8 _rightOffset,
         uint8 _valueBitLength
-    ) external pure returns (uint256 value_) {
+    ) internal pure returns (uint256 value_) {
         require(
             uint16(_rightOffset) + uint16(_valueBitLength) <= 256,
             "too many bits"
@@ -105,7 +105,7 @@ library Multislot {
     /// @param _bits A multislot bit-layout
     /// @return values_ Values got from the multislot
     function unpackValuesFromSlot(uint256 _multislot, uint8[] memory _bits)
-        external
+        internal
         pure
         returns (uint256[] memory values_)
     {
