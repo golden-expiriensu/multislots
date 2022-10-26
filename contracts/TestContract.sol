@@ -43,6 +43,6 @@ contract TestContract {
         view
         returns (uint256[] memory values_)
     {
-        values_ = multislot.extractAllValuesFromSlot(_bits);
+        values_ = multislot.unpackValuesFromSlot(_bits);
     }
 }

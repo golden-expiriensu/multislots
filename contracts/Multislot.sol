@@ -104,7 +104,7 @@ library Multislot {
     /// @param _multislot A multislot
     /// @param _bits A multislot bit-layout
     /// @return values_ Values got from the multislot
-    function extractAllValuesFromSlot(uint256 _multislot, uint8[] memory _bits)
+    function unpackValuesFromSlot(uint256 _multislot, uint8[] memory _bits)
         external
         pure
         returns (uint256[] memory values_)
