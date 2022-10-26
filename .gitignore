@@ -4,6 +4,5 @@ cache
 .vscode
 .env
 *.js
-*.yaml
 coverage
 coverage.json
