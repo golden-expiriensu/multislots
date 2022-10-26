@@ -16,26 +16,35 @@ contract TestContract {
         uint8 _rightOffset,
         uint8 _valueBitLength
     ) external {
-        multislot = multislot.pushSingleValueToSlot(_value, _rightOffset, _valueBitLength);
+        multislot = multislot.pushSingleValueToSlot(
+            _value,
+            _rightOffset,
+            _valueBitLength
+        );
     }
 
-    function setValuesToSlot(
-        uint256[] calldata _values,
-        uint8[] calldata _bits
-    ) external {
+    function setValuesToSlot(uint256[] calldata _values, uint8[] calldata _bits)
+        external
+    {
         multislot = _values.pushValuesToSlot(_bits);
     }
 
-    function getValueFromSlot(
-        uint8 _rightOffset,
-        uint8 _valueBitLength
-    ) external view returns(uint256 _value) {
-        _value = multislot.pullSingleValueFromSlot(_rightOffset, _valueBitLength);
+    function getValueFromSlot(uint8 _rightOffset, uint8 _valueBitLength)
+        external
+        view
+        returns (uint256 _value)
+    {
+        _value = multislot.pullSingleValueFromSlot(
+            _rightOffset,
+            _valueBitLength
+        );
     }
 
-    function getValuesFromSlot(
-        uint8[] calldata _bits
-    ) external view returns(uint256[] memory values_) {
+    function getValuesFromSlot(uint8[] calldata _bits)
+        external
+        view
+        returns (uint256[] memory values_)
+    {
         values_ = multislot.pullValuesFromSlot(_bits);
     }
 }
