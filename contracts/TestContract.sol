@@ -5,8 +5,6 @@ import "./Multislots.sol";
 
 contract TestContract {
     using Multislots for uint256;
-    using Multislots for uint256[2];
-    using Multislots for uint256[3];
     using Multislots for uint256[];
 
     uint256 multislot;
@@ -16,7 +14,7 @@ contract TestContract {
         uint8 _rightOffset,
         uint8 _valueBitLength
     ) external {
-        multislot = multislot.pushSingleValueToSlot(
+        multislot = multislot.insertValueToSlot(
             _value,
             _rightOffset,
             _valueBitLength
@@ -26,7 +24,7 @@ contract TestContract {
     function setValuesToSlot(uint256[] calldata _values, uint8[] calldata _bits)
         external
     {
-        multislot = _values.pushValuesToSlot(_bits);
+        multislot = _values.packValuesToSlot(_bits);
     }
 
     function getValueFromSlot(uint8 _rightOffset, uint8 _valueBitLength)
@@ -34,7 +32,7 @@ contract TestContract {
         view
         returns (uint256 _value)
     {
-        _value = multislot.pullSingleValueFromSlot(
+        _value = multislot.extractSingleValueFromSlot(
             _rightOffset,
             _valueBitLength
         );
@@ -45,6 +43,6 @@ contract TestContract {
         view
         returns (uint256[] memory values_)
     {
-        values_ = multislot.pullValuesFromSlot(_bits);
+        values_ = multislot.extractAllValuesFromSlot(_bits);
     }
 }

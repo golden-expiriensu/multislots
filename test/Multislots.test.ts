@@ -1,6 +1,7 @@
-import { ethers } from "hardhat";
-import { Contract } from "@ethersproject/contracts";
 import { expect } from "chai";
+import { deployments, ethers } from "hardhat";
+
+import { TestContract } from "../typechain";
 
 let mv = {
   u8: ethers.BigNumber.from(255),
@@ -18,11 +19,11 @@ let mv = {
 };
 
 describe("Tests for test contract", () => {
-  let contract: Contract;
+  let contract: TestContract;
 
   beforeEach(async () => {
-    let contractF = await ethers.getContractFactory("TestContract");
-    contract = await contractF.deploy();
+    await deployments.fixture(["Multislots", "TestContract"]);
+    contract = await ethers.getContract<TestContract>("TestContract");
   });
 
   describe("Should properly pass values to slot", () => {
