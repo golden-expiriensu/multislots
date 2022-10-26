@@ -1,42 +1,57 @@
-import { config as dotenvConfig } from 'dotenv';
-dotenvConfig();
-
-import '@nomiclabs/hardhat-waffle';
+import "./tasks";
 import "@nomiclabs/hardhat-ethers";
-import 'solidity-coverage';
-import "hardhat-gas-reporter"
+import "@nomiclabs/hardhat-etherscan";
+import "@nomiclabs/hardhat-waffle";
+import "@typechain/hardhat";
+import "hardhat-contract-sizer";
+import "hardhat-deploy";
+import "hardhat-gas-reporter";
+import "solidity-coverage";
 
-/**
- * @type import('hardhat/config').HardhatUserConfig
- */
-module.exports = {
-  defaultNetwork: 'hardhat',
+import * as dotenv from "dotenv";
+import { HardhatUserConfig } from "hardhat/config";
+
+dotenv.config();
+
+const config: HardhatUserConfig = {
+  solidity: "0.8.4",
+  namedAccounts: {
+    deployer: 0,
+  },
+  networks: {
+    rinkeby: {
+      url: process.env.RINKEBY_URL || "",
+      accounts:
+        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    },
+    bscTestnet: {
+      url: process.env.BCS_TESTNET_URL || "",
+      accounts:
+        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    },
+    polygonMumbai: {
+      url: process.env.MUMBAI_URL || "",
+      accounts:
+        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    },
+    avalancheFujiTestnet: {
+      url: process.env.AVAX_FUJI || "",
+      accounts:
+        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
+    },
+  },
+  gasReporter: {
+    enabled: process.env.REPORT_GAS !== undefined,
+    currency: "USD",
+  },
   etherscan: {
-    // Your API key for Etherscan
-    // Obtain one at https://etherscan.io/
-    apiKey: process.env.ETHERSCAN_API_KEY
-  },
-  paths: {
-    artifacts: './artifacts',
-    cache: './cache',
-    sources: './contracts',
-    tests: './test',
-    tasks: './tasks',
-  },
-  mocha: {
-    timeout: 20000
-  },
-  solidity: {
-    compilers: [
-      {
-        version: '0.8.4',
-        settings: {
-          optimizer: {
-            enabled: true,
-            runs: 400,
-          },
-        },
-      },
-    ],
+    apiKey: {
+      rinkeby: process.env.ETHERSCAN_API_KEY ?? '',
+      bscTestnet: process.env.BSCSCAN_API_KEY ?? '',
+      polygonMumbai: process.env.POLYGONSCAN_API_KEY ?? '',
+      avalancheFujiTestnet: process.env.AVASCAN_API_KEY ?? '',
+    },
   },
 };
+
+export default config;
