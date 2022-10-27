@@ -9,4 +9,4 @@ struct S {
 }, because you also waste gas on packing and unpacking the struct.
 For cheap chains like bsc and fantom, there is no need to use it, but if you use an array of these slots on the mainnet, you can save gas for those operations.
 
-Check TestContract.sol and Multislot.test.ts for an example of library use
+Check MultislotExampleContract.sol and Multislot.test.ts for an example of library use
