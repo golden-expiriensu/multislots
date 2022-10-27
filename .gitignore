@@ -1,6 +1,7 @@
 node_modules
 artifacts
 cache
+bin
 .vscode
 .env
 *.js
