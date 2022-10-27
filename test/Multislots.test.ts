@@ -23,7 +23,9 @@ describe("Tests for test contract", () => {
 
   beforeEach(async () => {
     await deployments.fixture(["Multislot", "MultislotExampleContract"]);
-    contract = await ethers.getContract<MultislotExampleContract>("MultislotExampleContract");
+    contract = await ethers.getContract<MultislotExampleContract>(
+      "MultislotExampleContract"
+    );
   });
 
   describe("Should properly pass values to slot", () => {
