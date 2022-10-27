@@ -21,9 +21,10 @@ contract TestContract {
         );
     }
 
-    function setValuesToSlot(uint256[] calldata _values, uint256[] calldata _bits)
-        external
-    {
+    function setValuesToSlot(
+        uint256[] calldata _values,
+        uint256[] calldata _bits
+    ) external {
         multislot = _values.packValues(_bits);
     }
 
