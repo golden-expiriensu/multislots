@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "./Multislot.sol";
+import "../Multislot.sol";
 
-contract TestContract {
+contract MultislotExampleContract {
     using Multislot for uint256;
     using Multislot for uint256[];
 

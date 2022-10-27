@@ -6,7 +6,7 @@
   },
   "name": "multislots",
   "scripts": {
-    "formatc": "pnpm prettier --write ./contracts/*.sol",
+    "formatc": "pnpm prettier --write ./contracts/*.sol && pnpm prettier --write ./contracts/*/*.sol",
     "formatt": "pnpm prettier --write ./test",
     "formatd": "pnpm prettier --write ./deploy",
     "format": "pnpm formatc && pnpm formatt && pnpm formatd",
