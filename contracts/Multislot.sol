@@ -10,11 +10,11 @@ library Multislot {
     /// @param _rightOffset An bit-offset from the right side of the _value: 0x|left offset|value|right offset|
     /// @param _valueBitLength How many bits value will occupy in the _multislot
     /// @return multislot_ The result of inserting
-    function insertValueToSlot(
+    function insertValue(
         uint256 _multislot,
         uint256 _value,
-        uint8 _rightOffset,
-        uint8 _valueBitLength
+        uint256 _rightOffset,
+        uint256 _valueBitLength
     ) internal pure returns (uint256 multislot_) {
         assembly {
             if gt(add(_rightOffset, _valueBitLength), 256) {
@@ -35,7 +35,7 @@ library Multislot {
     /// @param _values An array of values to compress in multislot. Must be less than the corresponding 2^_bits[i]
     /// @param _bits An array of values bit-lengths respectively to _values
     /// @return multislot_ The result of the compression of the values by their bit-sizes
-    function packValuesToSlot(uint256[] memory _values, uint8[] memory _bits)
+    function packValues(uint256[] memory _values, uint256[] memory _bits)
         internal
         pure
         returns (uint256 multislot_)
@@ -87,10 +87,10 @@ library Multislot {
     /// @param _rightOffset An bit-offset from the right side of the _value: 0x|left offset|value|right offset|
     /// @param _valueBitLength How many bits value occupy in the _multislot
     /// @return value_ The extracted value
-    function extractSingleValueFromSlot(
+    function extractSingleValue(
         uint256 _multislot,
-        uint8 _rightOffset,
-        uint8 _valueBitLength
+        uint256 _rightOffset,
+        uint256 _valueBitLength
     ) internal pure returns (uint256 value_) {
         require(
             uint16(_rightOffset) + uint16(_valueBitLength) <= 256,
@@ -104,14 +104,14 @@ library Multislot {
     /// @param _multislot A multislot
     /// @param _bits A multislot bit-layout
     /// @return values_ Values got from the multislot
-    function unpackValuesFromSlot(uint256 _multislot, uint8[] memory _bits)
+    function unpackValues(uint256 _multislot, uint256[] memory _bits)
         internal
         pure
         returns (uint256[] memory values_)
     {
         require(_bits.length > 0, "too few bits");
         values_ = new uint256[](_bits.length);
-        uint16 limit;
+        uint256 limit;
         for (int256 i = int256(_bits.length) - 1; i >= 0; i--) {
             limit += _bits[uint256(i)];
             require(limit <= 256, "too many bits");
