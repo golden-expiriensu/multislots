@@ -4,100 +4,121 @@ pragma solidity ^0.8.4;
 import "../AdjacentMultislots.sol";
 
 contract AdjacentMultislotsExampleContract {
-    // This struct cannot occupy less that 3 slots - 60000 gas for the first write
-    // because address(uint160) can only be packed with {uint8, ..., uint96}.
-    // But with AdjacentMultislots it can be packed to 160 * 3 = 480 bits, 480 / 256 = 1.875 ~ 2 slots
-    // Beware that if you will update address b, you will pay for updating 2 slots
-    // so it is mostly useful for one-time storage write
-    // Or if understand things under the hood, you can set to address b variable, that unlikely to be changed,
-    // and to a and c variables, that will be updated quite often
-    struct StructThatCannotBeOptimized {
+    // This struct cannot occupy less that 8 slots because address(uint160) can only be packed with {uint8, ..., uint96}
+    // But with AdjacentMultislots it can be packed to 160 * 8 = 1280 bits, 1280 / 256 = 5 slots
+    //
+    // Beware that if you will update b, d, e, g you will pay x2 gas because those values will be
+    // stored in 2 slots: in the end of the y slot and at the start of the y + 1 slot
+    // => It is useless for frequently updating data
+    //
+    // Or if understand things under the hood, you can set to b, d, e, g variables, that unlikely to be changed,
+    // and to a, c, f, h variables, that will be updated very often
+    //
+    // P.S. In DAPPs without backend merkle tree is not an option because then every address update will cause frontend redeployment
+    struct WhitelistWithoutMerkleTree {
         address a;
         address b;
         address c;
+        address d;
+        address e;
+        address f;
+        address g;
+        address h;
     }
 
-    // 0, 1, 2 slot for the unoptimized struct
-    StructThatCannotBeOptimized public unoptimized;
-    // 3, 4 slot for the optimized struct
-    uint256 optimizedStructMultislot1;
-    uint256 optimizedStructMultislot2;
+    // 0-7 slots for the defaultStruct whitelist
+    WhitelistWithoutMerkleTree defaultStruct;
+
+    // 0xe6b...d5c - 0xe6b...d60 slots for the packed whitelist
+    uint256 constant whitelistSlot = 8;
 
     event GasLog(uint256 gasSpent);
 
-    function setUnoptimized(StructThatCannotBeOptimized calldata _data)
+    function setUnoptimized(WhitelistWithoutMerkleTree calldata _data)
         external
     {
         uint256 gasBefore = gasleft();
 
-        unoptimized = _data;
+        defaultStruct = _data;
 
         uint256 gasAfter = gasleft();
 
         emit GasLog(gasBefore - gasAfter);
     }
 
-    function setOptimized(StructThatCannotBeOptimized calldata _data) external {
-        uint256 writeAt;
-
+    function setOptimized(WhitelistWithoutMerkleTree calldata _data) external {
         uint256 gasBefore = gasleft();
 
-        assembly {
-            writeAt := optimizedStructMultislot1.slot
-        }
-
-        AdjacentMultislots.writeValues(
-            writeAt,
-            toDynamic3Array([_data.a, _data.b, _data.c]),
-            toDynamic3Array([160, 160, 160])
+        AdjacentMultislots.write(
+            whitelistSlot,
+            toDynamic8Array(
+                [
+                    _data.a,
+                    _data.b,
+                    _data.c,
+                    _data.d,
+                    _data.e,
+                    _data.f,
+                    _data.g,
+                    _data.h
+                ]
+            ),
+            toDynamic8Array([160, 160, 160, 160, 160, 160, 160, 160])
         );
 
         uint256 gasAfter = gasleft();
 
         emit GasLog(gasBefore - gasAfter);
+    }
+
+    function getUnoptimized()
+        external
+        view
+        returns (WhitelistWithoutMerkleTree memory)
+    {
+        return defaultStruct;
     }
 
     function getOptimized()
         external
         view
-        returns (StructThatCannotBeOptimized memory result_)
+        returns (WhitelistWithoutMerkleTree memory)
     {
-        uint256 slot1;
-        uint256 slot2;
-
-        assembly {
-            slot1 := sload(3)
-            slot2 := sload(4)
-        }
-
-        result_.a = address(uint160(slot1 >> 96));
-        result_.c = address(uint160((slot2 << 64) >> 96));
-        result_.b = address(
-            uint160(((slot1 - ((slot1 >> 96) << 96)) << 64) | (slot2 >> 192))
+        uint256[] memory values = AdjacentMultislots.read(
+            whitelistSlot,
+            toDynamic8Array([160, 160, 160, 160, 160, 160, 160, 160])
         );
+
+        return
+            WhitelistWithoutMerkleTree({
+                a: address(uint160(values[0])),
+                b: address(uint160(values[1])),
+                c: address(uint160(values[2])),
+                d: address(uint160(values[3])),
+                e: address(uint160(values[4])),
+                f: address(uint160(values[5])),
+                g: address(uint160(values[6])),
+                h: address(uint160(values[7]))
+            });
     }
 
-    function toDynamic3Array(address[3] memory _data)
+    function toDynamic8Array(address[8] memory _data)
         private
         pure
         returns (uint256[] memory result_)
     {
-        result_ = new uint256[](3);
+        result_ = new uint256[](8);
 
-        result_[0] = uint160(_data[0]);
-        result_[1] = uint160(_data[1]);
-        result_[2] = uint160(_data[2]);
+        for (uint256 i; i < 8; i++) result_[i] = uint160(_data[i]);
     }
 
-    function toDynamic3Array(uint8[3] memory _data)
+    function toDynamic8Array(uint8[8] memory _data)
         private
         pure
         returns (uint256[] memory result_)
     {
-        result_ = new uint256[](3);
+        result_ = new uint256[](8);
 
-        result_[0] = _data[0];
-        result_[1] = _data[1];
-        result_[2] = _data[2];
+        for (uint256 i; i < 8; i++) result_[i] = _data[i];
     }
 }

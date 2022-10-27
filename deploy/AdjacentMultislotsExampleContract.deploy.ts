@@ -10,7 +10,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   await deploy("AdjacentMultislotsExampleContract", {
     from: deployer,
     args: [],
-    log: true
+    log: true,
   });
 };
 
