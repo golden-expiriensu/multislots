@@ -55,4 +55,25 @@ describe("AdjacentMultislotsExampleContract tests", () => {
 
     expect(await contract.getOptimized()).eql(await contract.getUnoptimized());
   });
+
+  it("Values from optimzied and unoptimized struct stored separately", async () => {
+    await contract.setOptimized(exampleStruct);
+    await contract.setUnoptimized(exampleStruct);
+
+    expect(await contract.getOptimized()).eql(await contract.getUnoptimized());
+
+    const [a, b, c, d, e, f, g, h] = (await ethers.getSigners()).map(
+      (e) => e.address
+    );
+    exampleStruct = { h: a, g: b, f: c, e: d, d: e, c: f, b: g, a: h };
+    await contract.setUnoptimized(exampleStruct);
+
+    expect(await contract.getOptimized()).not.eql(
+      await contract.getUnoptimized()
+    );
+
+    await contract.setOptimized(exampleStruct);
+
+    expect(await contract.getOptimized()).eql(await contract.getUnoptimized());
+  });
 });
