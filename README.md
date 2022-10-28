@@ -21,6 +21,7 @@ This is there optimization takes it's place. Let's imagine you need to store 80 
 | Slot 1 | 160 bit | 96 bit  | Slot 2 | 64 bits | 160 bits | 32 bit |
 |-|-|-|-|-|-|-|
 | | I am whole address A | I am only first 96 bits of address B | | I am the second part of address B | I am whole address C | I am so useless |
+
 Take a look at address B - it is stored at two slots. We will save gas for the first write (since we occupy not 3 but 2 slots), but if you will update address B you will update 2 slots and pay for 2 slots update. [Second write is cheaper than first one][SStore], but if you have to update it often you will waste more gas, so it is only makes sence for storing immutable-like data.
 > If you will update only address A and C you will not waste x2 gas. If you will update A, B and C at the same transaction you will not waste x2 gas as well. The only drawback is updating address B alone.
 
